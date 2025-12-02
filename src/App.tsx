@@ -1,62 +1,58 @@
+/* src/App.tsx */
 import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar/navbar';
 import Hero from './components/Hero/Hero';
 import Scanner from './components/Scanner/Scanner';
 import Collection from './components/Collection/Collection';
-import AuthModal from './components/AuthModal/AuthModal';
-import { mockSupabase } from './Utils/mockSupabase';
-import './App.css'; // File css kosong atau global jika perlu
+
+// Jika kamu punya AuthModal, import juga disini
+// import AuthModal from './component/AuthModal/AuthModal';
 
 export default function App() {
-  const [user, setUser] = useState<any>(null);
-  const [showAuth, setShowAuth] = useState(false);
-  const [collection, setCollection] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null); // State User (null = belum login)
 
-  const refs = {
-    home: useRef<HTMLDivElement>(null),
-    scanner: useRef<HTMLDivElement>(null),
-    collection: useRef<HTMLDivElement>(null),
+  // Refs untuk Scroll
+  const homeRef = useRef<HTMLDivElement>(null);
+  const scannerRef = useRef<HTMLDivElement>(null);
+  const collectionRef = useRef<HTMLDivElement>(null);
+
+  // Fungsi Scroll
+  const scrollToSection = (section: string) => {
+    if (section === 'home') homeRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (section === 'scanner') scannerRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (section === 'collection') collectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const scrollTo = (key: string) => refs[key as keyof typeof refs]?.current?.scrollIntoView({ behavior: 'smooth' });
-
-  const fetchCol = async () => {
-    const { data } = await mockSupabase.from('mushrooms').select();
-    if(data) setCollection(data);
+  // Dummy Login
+  const handleLogin = () => {
+    const email = prompt("Masukkan Email (Simulasi):", "andy@binus.ac.id");
+    if (email) setUser({ name: "Andy", email });
   };
 
   return (
     <>
       <Navbar 
-        user={user} 
-        onLogout={() => setUser(null)} 
-        onOpenAuth={() => setShowAuth(true)}
-        scrollToSection={scrollTo}
+        scrollToSection={scrollToSection} 
+        onOpenAuth={handleLogin}
       />
       
-      <Hero ref={refs.home} scrollToSection={scrollTo} />
-      
-      <Scanner 
-        ref={refs.scanner}
-        user={user}
-        onOpenAuth={() => setShowAuth(true)}
-        onRefreshCollection={fetchCol}
-      />
-      
-      <Collection 
-        ref={refs.collection}
-        user={user}
-        collection={collection}
-        onRefresh={fetchCol}
-        onOpenAuth={() => setShowAuth(true)}
-      />
+      {/* Wrapper Ref */}
+      <div ref={homeRef}>
+        <Hero scrollToSection={scrollToSection} />
+      </div>
 
-      {showAuth && (
-        <AuthModal 
-          onClose={() => setShowAuth(false)} 
-          onSuccess={(u) => { setUser(u); fetchCol(); }} 
-        />
-      )}
+      <div ref={scannerRef}>
+        <Scanner user={user} onOpenAuth={handleLogin} />
+      </div>
+
+      <div ref={collectionRef}>
+        <Collection user={user} onOpenAuth={handleLogin} collection={[1,2,3]} />
+      </div>
+      
+      {/* Footer Simple */}
+      <footer style={{textAlign: 'center', padding: '40px', background: 'white', color: '#9ca3af', fontSize: '0.85rem'}}>
+        &copy; 2025 MushroomVision Project.
+      </footer>
     </>
   );
 }

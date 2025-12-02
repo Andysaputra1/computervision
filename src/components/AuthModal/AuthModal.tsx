@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { mockSupabase } from '../../utils/mockSupabase';
+import { mockSupabase } from '../../Utils/mockSupabase';
 import './AuthModal.css';
 
 interface AuthModalProps {
