@@ -1,0 +1,29 @@
+:root {
+  --primary: #059669; /* Emerald 600 */
+  --primary-dark: #047857; /* Emerald 700 */
+  --secondary: #f5f5f4; /* Stone 100 */
+  --text-main: #1c1917; /* Stone 900 */
+  --text-muted: #78716c; /* Stone 500 */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --radius: 1rem;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #fafaf9; /* Stone 50 */
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Scrollbar halus */
+html {
+  scroll-behavior: smooth;
+}
