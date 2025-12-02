@@ -1,0 +1,43 @@
+.hero {
+  padding: 140px 20px 80px;
+  text-align: center;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.hero-badge {
+  background: #dcfce7; color: var(--primary);
+  padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.8rem;
+  margin-bottom: 20px; display: inline-flex; gap: 8px; align-items: center;
+}
+
+.hero h1 {
+  font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px;
+}
+
+.gradient-text {
+  background: linear-gradient(to right, var(--primary), #064e3b);
+  -webkit-background-clip: text; color: transparent;
+}
+
+.hero p {
+  color: var(--gray); font-size: 1.2rem; max-width: 600px; margin-bottom: 40px;
+}
+
+.hero-btns {
+  display: flex; gap: 15px;
+}
+
+.btn-primary {
+  background: var(--dark); color: white; border: none;
+  padding: 12px 30px; border-radius: 50px; font-weight: bold;
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+
+.btn-secondary {
+  background: white; color: var(--dark); border: 1px solid var(--border);
+  padding: 12px 30px; border-radius: 50px; font-weight: bold;
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-secondary:hover { background: #f5f5f4; }
