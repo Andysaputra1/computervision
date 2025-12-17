@@ -1,46 +1,88 @@
 import React, { useState, forwardRef } from 'react';
-import { Upload, Search, X, Loader2, Save, MapPin, AlertTriangle } from 'lucide-react';
+import { Upload, Search, X, Loader2, RefreshCcw, MapPin, AlertTriangle } from 'lucide-react';
 import './Scanner.css';
 
-// Mock Logic (Bisa diganti nanti)
-const mockAnalyze = async () => {
-  await new Promise(r => setTimeout(r, 2000));
-  return {
-    name: "Amanita Muscaria",
-    confidence: 0.98,
-    desc: "Jamur merah ikonik dengan bintik putih. Sering ditemukan di hutan pinus. Cantik tapi beracun!",
-    region: "Eropa & Amerika Utara",
-    edibility: "Beracun"
-  };
-};
-
-interface ScannerProps {
-  onOpenAuth: () => void;
-  user: any;
+// 1. Tambahkan Interface agar tidak error TypeScript
+interface MushroomResult {
+  name: string;
+  confidence: number;
+  desc: string;
+  region: string;
+  edibility: string;
 }
 
-const Scanner = forwardRef<HTMLDivElement, ScannerProps>(({ user, onOpenAuth }, ref) => {
+interface ScannerProps {}
+
+const Scanner = forwardRef<HTMLDivElement, ScannerProps>((_, ref) => {
   const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  // 2. Gunakan interface disini menggantikan 'any'
+  const [result, setResult] = useState<MushroomResult | null>(null); 
+  const [error, setError] = useState<string | null>(null);
+
+  // --- Masukkan URL Railway Anda disini ---
+  // Contoh: https://backendcv-production.up.railway.app
+  const API_URL = "MASUKKAN_LINK_RAILWAY_ANDA_DISINI"; 
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      setImage(URL.createObjectURL(e.target.files[0]));
+      const file = e.target.files[0];
+      setImage(URL.createObjectURL(file));
+      setImageFile(file);
       setResult(null);
+      setError(null);
     }
   };
 
   const onAnalyze = async () => {
+    if (!imageFile) return;
+
     setLoading(true);
-    const data = await mockAnalyze();
-    setResult(data);
-    setLoading(false);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    try {
+      // 3. PERBAIKAN UTAMA DISINI
+      // Menggunakan URL Railway + endpoint /predict
+      const response = await fetch(`${API_URL}/predict`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal menghubungi server. Pastikan backend aktif.');
+      }
+
+      const data = await response.json();
+      
+      // Handle jika backend mengembalikan error logic (misal gambar corrupt)
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setResult(data);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Terjadi kesalahan saat memproses gambar.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setImage(null);
+    setImageFile(null);
+    setResult(null);
+    setError(null);
   };
 
   return (
     <section ref={ref} className="scanner-section">
       <div className="scanner-container">
+        {/* ... (Sisa kode UI ke bawah SAMA PERSIS dengan punya Anda) ... */}
         
         {/* Header */}
         <div className="scanner-header">
@@ -49,14 +91,13 @@ const Scanner = forwardRef<HTMLDivElement, ScannerProps>(({ user, onOpenAuth }, 
         </div>
 
         <div className="scanner-grid">
-          
           {/* KIRI: Upload */}
           <div>
             <div className="upload-card" onClick={() => !image && document.getElementById('fileInput')?.click()}>
               {image ? (
                 <>
                   <img src={image} alt="Preview" className="img-preview" />
-                  <button onClick={(e) => {e.stopPropagation(); setImage(null); setResult(null);}} className="btn-reset">
+                  <button onClick={(e) => {e.stopPropagation(); handleReset();}} className="btn-reset">
                     <X size={20} />
                   </button>
                 </>
@@ -71,11 +112,23 @@ const Scanner = forwardRef<HTMLDivElement, ScannerProps>(({ user, onOpenAuth }, 
               )}
             </div>
 
-            {image && !result && (
-              <button onClick={onAnalyze} className="btn-analyze" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin" /> : <Search size={20} />}
-                {loading ? 'Menganalisa...' : 'Analisa Sekarang'}
+            {image && !result && !loading && (
+              <button onClick={onAnalyze} className="btn-analyze">
+                <Search size={20} /> Analisa Sekarang
               </button>
+            )}
+
+            {loading && (
+               <button className="btn-analyze" disabled>
+                 <Loader2 className="animate-spin" /> Menganalisa...
+               </button>
+            )}
+
+            {error && (
+              <div style={{marginTop: '1rem', color: '#ef4444', fontSize: '0.9rem', textAlign: 'center', background: '#fee2e2', padding: '10px', borderRadius: '8px'}}>
+                <AlertTriangle size={16} style={{display:'inline', marginRight:'5px'}}/>
+                {error}
+              </div>
             )}
           </div>
 
@@ -98,8 +151,8 @@ const Scanner = forwardRef<HTMLDivElement, ScannerProps>(({ user, onOpenAuth }, 
                   </div>
                 </div>
 
-                <button className="btn-save" onClick={() => !user ? onOpenAuth() : alert('Disimpan!')}>
-                  <Save size={18}/> Simpan ke Koleksi
+                <button className="btn-save" onClick={handleReset}>
+                  <RefreshCcw size={18}/> Upload/Scan Lainnya
                 </button>
               </div>
             ) : (

@@ -1,13 +1,12 @@
 import React from 'react';
-import { Leaf, User } from 'lucide-react';
+import { Leaf } from 'lucide-react';
 import './Navbar.css';
 
 interface NavbarProps {
   scrollToSection: (section: string) => void;
-  onOpenAuth: () => void;
 }
 
-export default function Navbar({ scrollToSection, onOpenAuth }: NavbarProps) {
+export default function Navbar({ scrollToSection }: NavbarProps) {
   return (
     <nav className="navbar">
       <div className="nav-container">
@@ -20,13 +19,8 @@ export default function Navbar({ scrollToSection, onOpenAuth }: NavbarProps) {
         <div className="nav-menu">
           <button onClick={() => scrollToSection('home')} className="nav-link">Home</button>
           <button onClick={() => scrollToSection('scanner')} className="nav-link">Scanner</button>
-          <button onClick={() => scrollToSection('collection')} className="nav-link">Koleksi</button>
         </div>
 
-
-        <button className="user-btn" onClick={onOpenAuth}>
-          <User size={20} />
-        </button>
       </div>
     </nav>
   );
