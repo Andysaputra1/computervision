@@ -23,7 +23,7 @@ const Scanner = forwardRef<HTMLDivElement, ScannerProps>((_, ref) => {
 
   // --- Masukkan URL Railway Anda disini ---
   // Contoh: https://backendcv-production.up.railway.app
-  const API_URL = "MASUKKAN_LINK_RAILWAY_ANDA_DISINI"; 
+  const API_URL = "backendcv-production-c990.up.railway.app"; 
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
